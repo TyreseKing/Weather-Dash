@@ -1,3 +1,5 @@
+function initpage(){
+
 const inputEl = document.getElementById("city-input");
 const searchEl = document.getElementById("search-button");
 const clearEl = document.getElementById("clear-history");
@@ -23,8 +25,8 @@ function fetchWeather(searchedCity) {
             var year = currentDate.getFullYear()
             nameEl.innerHTML = data.name + " (" + month + "/" + day + "/" + year + ")"
             currentTempEl.innerHTML = "Temp: " + Math.floor(data.main.temp) + " &#176F";
-            currentHumidityEl.innerHTML = "Humidity: " + data.main.humidity + "%"
-            currentWindEl.innerHTML = "Wind: " + Math.floor(data.wind.speed) + " MPH"
+            currentHumidityEl.innerHTML = "Humidity: " + data.main.humidity + "%";
+            currentWindEl.innerHTML = "Wind: " + Math.floor(data.wind.speed) + " MPH";
             var weatherIcon = data.weather[0].icon
             currentPicEl.setAttribute("src", "https://openweathermap.org/img/wn/" + weatherIcon + "@2x.png")
             var lat = data.coord.lat;
@@ -70,6 +72,39 @@ function fetchWeather(searchedCity) {
 
 
 searchEl.addEventListener("click", function(){
-    var searchedCity = inputEl.value;
-    fetchWeather(searchedCity)
+    const searchedTerm = inputEl.value;
+    fetchWeather(searchedTerm);
+    searchHistory.push(searchedTerm);
+    localStorage.setItem("search", JSON.stringify(searchHistory));
+    rendersearchHistory();
 })
+
+clearEl.addEventListener("click", function(){
+    searchHistory = [];
+    rendersearchHistory();
+})
+
+function rendersearchHistory() {
+    historyEl.innerHTML = "";
+    for (let i = 0; i < searchHistory.length; i++) {
+        const historyItem = document.createElement("input");
+        historyItem.setAttribute("type", "text");
+        historyItem.setAttribute("style", "margin-bottom: 10px;");
+        historyItem.setAttribute("readonly", true);
+        historyItem.setAttribute("class","form-control d-block bg-grey");
+        historyItem.setAttribute("value", searchHistory[i]);
+        historyItem.addEventListener("click", function(){
+            fetchweather(historyItem.value);
+
+        })
+        historyEl.append(historyItem)
+    }
+}
+
+rendersearchHistory();
+if (searchHistory.lenth > 0) {
+    getweather(searchHistory[searchHistory.lenth - 1]);
+}
+
+}
+initpage();
